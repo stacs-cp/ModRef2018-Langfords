@@ -1,10 +1,11 @@
 
 mkdir -p outputs
+mkdir -p logs
 
 # run the following command for the Minion
 parallel \
-    --joblog  gnuparallel/joblog-Minion \
-    --results gnuparallel/results-Minion \
+    --joblog  logs/joblog-Minion \
+    --results logs/results-Minion \
     --timeout 4h \
     --eta \
     "conjure solve {2} {1} --number-of-solutions all -o outputs/{2/.} --copy-solutions=no --solutions-in-one-file" ::: params/*.param ::: models/*.essence
