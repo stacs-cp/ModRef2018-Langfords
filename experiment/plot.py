@@ -10,7 +10,7 @@ timeout = 4 * 3600
 
 raw = []
 
-with open("all-info.txt") as f:
+with open("outputs/all-info.txt") as f:
     for row in f:
         parts = row.strip().split("\t")
         if len(parts) == 2:
@@ -78,7 +78,22 @@ def float_(s):
     else:
         return float(s)
 
-cpmodels = ['o-combinedDirect', 'o-combinedPosition', 'o-direct', 'o-positional']
+cpmodels = [ "Langford-direct"
+           , "Langford-positional"
+           , "Langford-combined-symD-branchD-consD"
+           , "Langford-combined-symD-branchD-consFull"
+           , "Langford-combined-symD-branchD-consP"
+           , "Langford-combined-symD-branchP-consD"
+           , "Langford-combined-symD-branchP-consFull"
+           , "Langford-combined-symD-branchP-consP"
+           , "Langford-combined-symP-branchD-consD"
+           , "Langford-combined-symP-branchD-consFull"
+           , "Langford-combined-symP-branchD-consP"
+           , "Langford-combined-symP-branchP-consD"
+           , "Langford-combined-symP-branchP-consFull"
+           , "Langford-combined-symP-branchP-consP"
+           ]
+
 
 def get(model, param):
     found = [ entry for entry in raw
@@ -234,10 +249,10 @@ def plotNodes():
 
     # plt.show()
 
-    # plt.savefig("plot-Nodes.png", bbox_inches="tight")
-    plt.savefig("plot-Nodes.png")
+    # plt.savefig("plots/plot-Nodes.png", bbox_inches="tight")
+    plt.savefig("plots/plot-Nodes.png")
     plt.legend()
-    plt.savefig("plot-Nodes-legend.png")
+    plt.savefig("plots/plot-Nodes-legend.png")
     plt.close()
 
 
@@ -334,10 +349,10 @@ def plotSolverTime(timeField):
 
     # plt.show()
 
-    # plt.savefig("plot-SolverTime.png", bbox_inches="tight")
-    plt.savefig("plot-%s.png" % timeField)
+    # plt.savefig("plots/plot-SolverTime.png", bbox_inches="tight")
+    plt.savefig("plots/plot-%s.png" % timeField)
     plt.legend()
-    plt.savefig("plot-%s-legend.png" % timeField)
+    plt.savefig("plots/plot-%s-legend.png" % timeField)
     plt.close()
 
 plotSolverTime("Time")
@@ -350,13 +365,25 @@ plotSolverTime("SolverSolutionsFound")
 
 
 modelFace = {}
-modelFace['o-combinedDirect']       = "Minion Combined (Direct)"
-modelFace['o-combinedPosition']     = "Minion Combined (Positional)"
-modelFace['o-direct']               = "Minion Direct"
-modelFace['o-positional']           = "Minion Positional"
-modelFace['o-sat-combinedDirect']   = "SAT Combined"
-modelFace['o-sat-direct']           = "SAT Direct"
-modelFace['o-sat-positional']       = "SAT Positional"
+modelFace['Langford-direct']                         = 'direct'
+modelFace['Langford-positional']                     = 'positional'
+modelFace['Langford-combined-symD-branchD-consD']    = 'combined-symD-branchD-consD'
+modelFace['Langford-combined-symD-branchD-consFull'] = 'combined-symD-branchD-consFul'
+modelFace['Langford-combined-symD-branchD-consP']    = 'combined-symD-branchD-consP'
+modelFace['Langford-combined-symD-branchP-consD']    = 'combined-symD-branchP-consD'
+modelFace['Langford-combined-symD-branchP-consFull'] = 'combined-symD-branchP-consFul'
+modelFace['Langford-combined-symD-branchP-consP']    = 'combined-symD-branchP-consP'
+modelFace['Langford-combined-symP-branchD-consD']    = 'combined-symP-branchD-consD'
+modelFace['Langford-combined-symP-branchD-consFull'] = 'combined-symP-branchD-consFul'
+modelFace['Langford-combined-symP-branchD-consP']    = 'combined-symP-branchD-consP'
+modelFace['Langford-combined-symP-branchP-consD']    = 'combined-symP-branchP-consD'
+modelFace['Langford-combined-symP-branchP-consFull'] = 'combined-symP-branchP-consFul'
+modelFace['Langford-combined-symP-branchP-consP']    = 'combined-symP-branchP-consP'
+
+
+
+
+
 
 def paramFormat(s):
     [_, k, n] = s.split("_")
@@ -391,7 +418,46 @@ for timefield in ["Time", "SolverTime", "SavileRowTime", "Nodes", "SolverSolutio
             else:
                 times[m].append(timeout)
 
-    with open("table-%s.html" % timefield, "w") as f:
+    with open("plots/table-%s.tex" % timefield, "w") as f:
+
+        print("\\begin{tabular}{r", file=f, end="")
+        for m in selectModels:
+            print("R{15mm}", file=f, end="")
+        print("r}", file=f)
+
+        print("Instance &", file=f, end="\t")
+        for m in selectModels:
+            print("%s &" % modelFace[m], file=f, end="\t")
+        print("\\tabularnewline \\hline", file=f)
+
+        if timefield != "SolverSolutionsFound":
+            print("Sum &", file=f)
+            for m in selectModels:
+                print("%s &" % numberFormat(sum(times[m])), file=f, end="\t")
+            print("\\tabularnewline \\hline", file=f)
+
+            print("Mean &", file=f, end="\t")
+            for m in selectModels:
+                if len(times[m]) > 0:
+                    print("%s &" % numberFormat(statistics.mean(times[m])), file=f, end="\t")
+                else:
+                    print("- &", file=f, end="\t")
+            print("\\tabularnewline \\hline", file=f)
+
+        for p in params:
+            print("%s &" % paramFormat(p), file=f, end="\t")
+            for m in selectModels:
+                x = get(m,p)
+                if isNumber(x[timefield]):
+                    print("%s &" % numberFormat(x[timefield]), file=f, end="\t")
+                else:
+                    print("- &", file=f, end="\t")
+            print("\\tabularnewline \\hline", file=f)
+
+        print("\\end{tabular}", file=f)
+
+
+    with open("plots/table-%s.html" % timefield, "w") as f:
 
         print("<table>", file=f)
 
