@@ -12,8 +12,8 @@ mkdir -p plots
 #     "conjure solve {2} {1} --number-of-solutions all -o outputs/{2/.} --copy-solutions=no --solutions-in-one-file" ::: params/*.param ::: models/*.essence
 
 parallel \
-    --joblog  logs/joblog-Minion-heuristics \
-    --results logs/results-Minion-heuristics \
+    --joblog  logs/joblog-Minion-wdegs \
+    --results logs/results-Minion-wdegs \
     --timeout 4h \
     --eta \
     "conjure solve {2} {1} --number-of-solutions all -o outputs/{2/.}-{3} --copy-solutions=no --solutions-in-one-file" \
