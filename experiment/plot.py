@@ -199,7 +199,7 @@ def plotNodes():
 
     order = []
     for p in params:
-        x = get("o-combinedDirect", p)
+        x = get("Langford-combined-symD-branchD-consFull", p)
         if "Nodes" in x.keys() and isNumber(x["Nodes"]):
             if x["Nodes"] >= 0:
                 order.append((x["Nodes"], p))
@@ -299,7 +299,7 @@ def plotSolverTime(timeField):
 
     order = []
     for p in params:
-        x = get("o-combinedDirect", p)
+        x = get("Langford-combined-symD-branchD-consFull", p)
         if timeField in x.keys() and isNumber(x[timeField]):
             if x[timeField] >= 5:
                 order.append((x[timeField], p))
@@ -330,7 +330,7 @@ def plotSolverTime(timeField):
                 # ix.append(i)
                 # vals.append(timeout)
                 pass
-        plt.plot( ix
+        plt.scatter( ix
                    , vals
                    # , color="blue"
                    # , marker="o"
@@ -431,7 +431,7 @@ for timefield in ["Time", "SolverTime", "SavileRowTime", "Nodes", "SolverSolutio
         print("\\tabularnewline \\hline", file=f)
 
         if timefield != "SolverSolutionsFound":
-            print("Sum &", file=f)
+            print("Sum &", file=f, end="\t")
             for m in selectModels:
                 print("%s &" % numberFormat(sum(times[m])), file=f, end="\t")
             print("\\tabularnewline \\hline", file=f)
@@ -497,3 +497,33 @@ for timefield in ["Time", "SolverTime", "SavileRowTime", "Nodes", "SolverSolutio
         print("</table>", file=f)
 
 
+    with open("plots/table-%s.tsv" % timefield, "w") as f:
+
+        print("Instance", file=f, end="\t")
+        for m in selectModels:
+            print("%s" % modelFace[m], file=f, end="\t")
+        print("", file=f)
+
+        if timefield != "SolverSolutionsFound":
+            print("Sum", file=f, end="\t")
+            for m in selectModels:
+                print("%s" % numberFormat(sum(times[m])), file=f, end="\t")
+            print("", file=f)
+
+            print("Mean", file=f, end="\t")
+            for m in selectModels:
+                if len(times[m]) > 0:
+                    print("%s" % numberFormat(statistics.mean(times[m])), file=f, end="\t")
+                else:
+                    print("-", file=f, end="\t")
+            print("", file=f)
+
+        for p in params:
+            print("%s" % paramFormat(p), file=f, end="\t")
+            for m in selectModels:
+                x = get(m,p)
+                if isNumber(x[timefield]):
+                    print("%s" % numberFormat(x[timefield]), file=f, end="\t")
+                else:
+                    print("-", file=f, end="\t")
+            print("", file=f)
