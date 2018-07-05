@@ -79,7 +79,11 @@ def float_(s):
         return float(s)
 
 cpmodels = [ "Langford-direct"
+           , "Langford-direct-wdeg"
+           , "Langford-direct-domoverwdeg"
            , "Langford-positional"
+           , "Langford-positional-wdeg"
+           , "Langford-positional-domoverwdeg"
            , "Langford-combined-symD-branchD-consD"
            , "Langford-combined-symD-branchD-consFull"
            , "Langford-combined-symD-branchD-consP"
@@ -366,7 +370,11 @@ plotSolverTime("SolverSolutionsFound")
 
 modelFace = {}
 modelFace['Langford-direct']                         = 'direct'
+modelFace['Langford-direct-wdeg']                    = 'direct-wdeg'
+modelFace['Langford-direct-domoverwdeg']             = 'direct-domoverwdeg'
 modelFace['Langford-positional']                     = 'positional'
+modelFace['Langford-positional-wdeg']                = 'positional-wdeg'
+modelFace['Langford-positional-domoverwdeg']         = 'positional-domoverwdeg'
 modelFace['Langford-combined-symD-branchD-consD']    = 'combined-symD-branchD-consD'
 modelFace['Langford-combined-symD-branchD-consFull'] = 'combined-symD-branchD-consFull'
 modelFace['Langford-combined-symD-branchD-consP']    = 'combined-symD-branchD-consP'
