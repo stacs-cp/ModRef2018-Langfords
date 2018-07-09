@@ -4,22 +4,22 @@ mkdir -p logs
 mkdir -p plots
 
 # run the following command for the Minion
-# parallel \
-#     --joblog  logs/joblog-Minion \
-#     --results logs/results-Minion \
-#     --timeout 4h \
-#     --eta \
-#     "conjure solve {2} {1} --number-of-solutions all -o outputs/{2/.} --copy-solutions=no --solutions-in-one-file" ::: params/*.param ::: models/*.essence
-
 parallel \
-    --joblog  logs/joblog-Minion-wdegs \
-    --results logs/results-Minion-wdegs \
+    --joblog  logs/joblog-Minion \
+    --results logs/results-Minion \
     --timeout 4h \
     --eta \
-    "conjure solve {2} {1} --number-of-solutions all -o outputs/{2/.}-{3} --copy-solutions=no --solutions-in-one-file --solver-options='-varorder {3}'" \
-    ::: params/*.param \
-    ::: models/Langford-direct.essence models/Langford-positional.essence \
-    ::: wdeg domoverwdeg
+    "conjure solve {2} {1} --number-of-solutions all -o outputs/{2/.} --copy-solutions=no --solutions-in-one-file" ::: params/*.param ::: models/*sdf.essence
+
+# parallel \
+#     --joblog  logs/joblog-Minion-wdegs \
+#     --results logs/results-Minion-wdegs \
+#     --timeout 4h \
+#     --eta \
+#     "conjure solve {2} {1} --number-of-solutions all -o outputs/{2/.}-{3} --copy-solutions=no --solutions-in-one-file --solver-options='-varorder {3}'" \
+#     ::: params/*.param \
+#     ::: models/Langford-direct.essence models/Langford-positional.essence \
+#     ::: wdeg domoverwdeg
 
 # and the following for the SAT
 # parallel --joblog joblog-sat --results results-sat --timeout 4h --eta -j16 "conjure solve Langford-{2}.essence {1} --solver bc_minisat_all --number-of-solutions all -o o-sat-{2} --copy-solutions=no --solutions-in-one-file" ::: params/*.param ::: direct positional combinedDirect
