@@ -96,6 +96,8 @@ cpmodels = [ "Langford-direct"
            , "Langford-combined-symP-branchP-consD"
            , "Langford-combined-symP-branchP-consFull"
            , "Langford-combined-symP-branchP-consP"
+           , "Langford-combined-symD-sdf"
+           , "Langford-combined-symP-sdf"
            ]
 
 
@@ -265,11 +267,11 @@ plotNodes()
 
 
 
-def plotSolverTime(timeField):
+def plotSolverTime(selectedModels, prefix, timeField):
     # for p in params:
     #     parts = []
     #     parts.append(p)
-    #     for m in models:
+    #     for m in selectedModels:
     #         info = get(m, p)
     #         if info == {}:
     #             parts.append("NA")
@@ -293,7 +295,7 @@ def plotSolverTime(timeField):
     plt.ylabel("Time")
 
     allPoints = []
-    for m in models:
+    for m in selectedModels:
         for p in params:
             x = get(m,p)
             if timeField in x.keys() and isNumber(x[timeField]):
@@ -319,8 +321,7 @@ def plotSolverTime(timeField):
         plt.ylim(min(allPoints), max(allPoints))
     plt.grid()
 
-    # for m in models:
-    for m in models:
+    for m in selectedModels:
         ix = []
         vals = []
         for i, p in enumerate(paramsOrdered):
@@ -354,15 +355,20 @@ def plotSolverTime(timeField):
     # plt.show()
 
     # plt.savefig("plots/plot-SolverTime.png", bbox_inches="tight")
-    plt.savefig("plots/plot-%s.png" % timeField)
+    plt.savefig("plots/plot-%s-%s.png" % (prefix, timeField))
     plt.legend()
-    plt.savefig("plots/plot-%s-legend.png" % timeField)
+    plt.savefig("plots/plot-%s-%s-legend.png" % (prefix, timeField))
     plt.close()
 
-plotSolverTime("Time")
-plotSolverTime("SolverTime")
-plotSolverTime("SavileRowTime")
-plotSolverTime("SolverSolutionsFound")
+plotSolverTime(models, "all", "Time")
+plotSolverTime(models, "all", "SolverTime")
+plotSolverTime(models, "all", "SavileRowTime")
+plotSolverTime(models, "all", "SolverSolutionsFound")
+
+plotSolverTime(["Langford-direct", "Langford-positional"], "noch", "Time")
+plotSolverTime(["Langford-direct", "Langford-positional"], "noch", "SolverTime")
+plotSolverTime(["Langford-direct", "Langford-positional"], "noch", "SavileRowTime")
+plotSolverTime(["Langford-direct", "Langford-positional"], "noch", "SolverSolutionsFound")
 
 
 
@@ -375,18 +381,21 @@ modelFace['Langford-direct-domoverwdeg']             = 'direct-domoverwdeg'
 modelFace['Langford-positional']                     = 'positional'
 modelFace['Langford-positional-wdeg']                = 'positional-wdeg'
 modelFace['Langford-positional-domoverwdeg']         = 'positional-domoverwdeg'
-modelFace['Langford-combined-symD-branchD-consD']    = 'combined-symD-branchD-consD'
-modelFace['Langford-combined-symD-branchD-consFull'] = 'combined-symD-branchD-consFull'
-modelFace['Langford-combined-symD-branchD-consP']    = 'combined-symD-branchD-consP'
-modelFace['Langford-combined-symD-branchP-consD']    = 'combined-symD-branchP-consD'
-modelFace['Langford-combined-symD-branchP-consFull'] = 'combined-symD-branchP-consFull'
-modelFace['Langford-combined-symD-branchP-consP']    = 'combined-symD-branchP-consP'
-modelFace['Langford-combined-symP-branchD-consD']    = 'combined-symP-branchD-consD'
-modelFace['Langford-combined-symP-branchD-consFull'] = 'combined-symP-branchD-consFull'
-modelFace['Langford-combined-symP-branchD-consP']    = 'combined-symP-branchD-consP'
-modelFace['Langford-combined-symP-branchP-consD']    = 'combined-symP-branchP-consD'
-modelFace['Langford-combined-symP-branchP-consFull'] = 'combined-symP-branchP-consFull'
-modelFace['Langford-combined-symP-branchP-consP']    = 'combined-symP-branchP-consP'
+modelFace['Langford-combined-symD-branchD-consD']    = 'symD-branchD-consD'
+modelFace['Langford-combined-symD-branchD-consFull'] = 'symD-branchD-consFull'
+modelFace['Langford-combined-symD-branchD-consP']    = 'symD-branchD-consP'
+modelFace['Langford-combined-symD-branchP-consD']    = 'symD-branchP-consD'
+modelFace['Langford-combined-symD-branchP-consFull'] = 'symD-branchP-consFull'
+modelFace['Langford-combined-symD-branchP-consP']    = 'symD-branchP-consP'
+modelFace['Langford-combined-symP-branchD-consD']    = 'symP-branchD-consD'
+modelFace['Langford-combined-symP-branchD-consFull'] = 'symP-branchD-consFull'
+modelFace['Langford-combined-symP-branchD-consP']    = 'symP-branchD-consP'
+modelFace['Langford-combined-symP-branchP-consD']    = 'symP-branchP-consD'
+modelFace['Langford-combined-symP-branchP-consFull'] = 'symP-branchP-consFull'
+modelFace['Langford-combined-symP-branchP-consP']    = 'symP-branchP-consP'
+modelFace['Langford-combined-symD-sdf']              = "symD-sdf"
+modelFace['Langford-combined-symP-sdf']              = "symP-sdf"
+
 
 
 
@@ -401,7 +410,7 @@ import locale
 locale.setlocale(locale.LC_ALL, 'en_US')
     
 def numberFormat(n):
-    s = locale.format("%.2f", n, grouping=True)
+    s = locale.format_string("%.2f", n, grouping=True)
     if s.endswith(".00"):
         s = s[:-3]
     return s
