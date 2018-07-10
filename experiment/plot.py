@@ -33,6 +33,30 @@ with open("outputs/all-info.txt") as f:
             sys.exit("What? -- " + row + " -- " + str(parts))
 
 
+modelFace = {}
+modelFace['Langford-direct']                         = 'Direct'
+modelFace['Langford-direct-wdeg']                    = 'Direct wdeg'
+modelFace['Langford-direct-domoverwdeg']             = 'Direct domoverwdeg'
+modelFace['Langford-positional']                     = 'Positional'
+modelFace['Langford-positional-wdeg']                = 'Positional wdeg'
+modelFace['Langford-positional-domoverwdeg']         = 'Positional domoverwdeg'
+modelFace['Langford-combined-symD-branchD-consD']    = 'branch:D sym:D cons:D'
+modelFace['Langford-combined-symD-branchD-consFull'] = 'branch:D sym:D cons:Both'
+modelFace['Langford-combined-symD-branchD-consP']    = 'branch:D sym:D cons:P'
+modelFace['Langford-combined-symD-branchP-consD']    = 'branch:P sym:D cons:D'
+modelFace['Langford-combined-symD-branchP-consFull'] = 'branch:P sym:D cons:Both'
+modelFace['Langford-combined-symD-branchP-consP']    = 'branch:P sym:D cons:P'
+modelFace['Langford-combined-symP-branchD-consD']    = 'branch:D sym:P cons:D'
+modelFace['Langford-combined-symP-branchD-consFull'] = 'branch:D sym:P cons:Both'
+modelFace['Langford-combined-symP-branchD-consP']    = 'branch:D sym:P cons:P'
+modelFace['Langford-combined-symP-branchP-consD']    = 'branch:P sym:P cons:D'
+modelFace['Langford-combined-symP-branchP-consFull'] = 'branch:P sym:P cons:Both'
+modelFace['Langford-combined-symP-branchP-consP']    = 'branch:P sym:P cons:P'
+modelFace['Langford-combined-symD-sdf']              = "SDF sym:D"
+modelFace['Langford-combined-symP-sdf']              = "SDF sym:P"
+
+
+
 # for point in raw:
 #     print(point)
 
@@ -167,11 +191,11 @@ print("Models (" + str(len(models)) + "): " + str(models))
 withlegend = True
 
 
-def plotNodes():
+def plotNodes(selectedModels, sortby, prefix, pyscale="symlog"):
     # for p in params:
     #     parts = []
     #     parts.append(p)
-    #     for m in models:
+    #     for m in selectedModels:
     #         info = get(m, p)
     #         if info == {}:
     #             parts.append("NA")
@@ -195,7 +219,7 @@ def plotNodes():
     plt.ylabel("Node count")
 
     allPoints = []
-    for m in cpmodels:
+    for m in selectedModels:
         for p in params:
             x = get(m,p)
             if "Nodes" in x.keys() and isNumber(x["Nodes"]):
@@ -205,12 +229,12 @@ def plotNodes():
 
     order = []
     for p in params:
-        x = get("Langford-combined-symD-branchD-consFull", p)
+        x = get(sortby, p)
         if "Nodes" in x.keys() and isNumber(x["Nodes"]):
             if x["Nodes"] >= 0:
                 order.append((x["Nodes"], p))
         else:
-            print("Missing: " + p)
+            print("Missing: %s -- %s" % (p, sortby))
 
     paramsOrdered = []
     for x in sorted(order):
@@ -220,26 +244,29 @@ def plotNodes():
     plt.ylim(min(allPoints), max(allPoints) + 200000000)
     plt.grid()
 
-    for m in cpmodels:
+    for m in selectedModels:
         ix = []
         vals = []
         for i, p in enumerate(paramsOrdered):
             x = get(m, p)
             if "Nodes" in x.keys() and isNumber(x["Nodes"]):
-                # print(x["Nodes"])
-                ix.append(i)
-                vals.append(x["Nodes"])
+                if pyscale == "linear" and int(x["Nodes"]) <= 1000:
+                    pass
+                else:
+                    # print(x["Nodes"])
+                    ix.append(i)
+                    vals.append(x["Nodes"])
             else:
                 # print(x)
-                ix.append(i)
-                vals.append(200000000)
+                # ix.append(i)
+                # vals.append(300000000)
                 pass
         plt.scatter( ix
                 , vals
                 # , color="blue"
                 # , marker="o"
                 # , linestyle="-."
-                , label=m
+                , label=modelFace[m]
                 , linewidth=3.0
                 )
 
@@ -249,25 +276,37 @@ def plotNodes():
     #     # plt.margins(x=1, y=1)
 
     plt.ticklabel_format(useOffset=False, style='plain', axis='y')
-    plt.yscale('symlog')
+    plt.yscale(pyscale)
 
     # plt.xticks( [ i for i,p in enumerate(paramsOrdered) ] , paramsOrdered )
 
     # plt.show()
 
     # plt.savefig("plots/plot-Nodes.png", bbox_inches="tight")
-    plt.savefig("plots/plot-Nodes.png")
+    plt.savefig("plots/plot-%s-Nodes.png" % prefix)
     plt.legend()
-    plt.savefig("plots/plot-Nodes-legend.png")
+    plt.savefig("plots/plot-%s-Nodes-legend.png" % prefix)
     plt.close()
 
 
-plotNodes()
+plotNodes(["Langford-direct", "Langford-positional"], "Langford-positional", "noch")
+plotNodes(["Langford-direct-wdeg", "Langford-direct-domoverwdeg", "Langford-positional-wdeg", "Langford-positional-domoverwdeg"], "Langford-positional-domoverwdeg", "noch-wdeg")
+plotNodes(["Langford-direct-domoverwdeg", "Langford-positional-domoverwdeg"], "Langford-positional-domoverwdeg", "noch-domoverwdeg")
+plotNodes(["Langford-direct", "Langford-positional", "Langford-direct-domoverwdeg", "Langford-positional-domoverwdeg"], "Langford-positional-domoverwdeg", "noch-domoverwdegplus")
+plotNodes(["Langford-positional-domoverwdeg", "Langford-combined-symD-sdf", "Langford-combined-symP-sdf"], "Langford-combined-symD-sdf", "SDF")
+plotNodes(["Langford-combined-symD-sdf", "Langford-combined-symD-branchD-consFull"], "Langford-combined-symD-branchD-consFull", "FINAL")
+plotNodes(["Langford-combined-symD-branchD-consFull", "Langford-combined-symP-branchD-consFull", "Langford-combined-symP-branchP-consFull", "Langford-combined-symD-branchP-consFull"], "Langford-combined-symD-branchD-consFull", "allchannelled")
+
+plotNodes(["Langford-combined-symD-branchD-consFull", "Langford-combined-symP-branchP-consFull"], "Langford-combined-symD-branchD-consFull", "branchDvsP")
+
+
+
+plotNodes(cpmodels, "Langford-combined-symD-branchD-consFull", "all")
 
 
 
 
-def plotSolverTime(selectedModels, prefix, timeField):
+def plotSolverTime(selectedModels, sortby, prefix, timeField):
     # for p in params:
     #     parts = []
     #     parts.append(p)
@@ -305,7 +344,7 @@ def plotSolverTime(selectedModels, prefix, timeField):
 
     order = []
     for p in params:
-        x = get("Langford-combined-symD-branchD-consFull", p)
+        x = get(sortby, p)
         if timeField in x.keys() and isNumber(x[timeField]):
             if x[timeField] >= 5:
                 order.append((x[timeField], p))
@@ -360,41 +399,15 @@ def plotSolverTime(selectedModels, prefix, timeField):
     plt.savefig("plots/plot-%s-%s-legend.png" % (prefix, timeField))
     plt.close()
 
-plotSolverTime(models, "all", "Time")
-plotSolverTime(models, "all", "SolverTime")
-plotSolverTime(models, "all", "SavileRowTime")
-plotSolverTime(models, "all", "SolverSolutionsFound")
+plotSolverTime(models, "Langford-combined-symD-branchD-consFull", "all", "Time")
+plotSolverTime(models, "Langford-combined-symD-branchD-consFull", "all", "SolverTime")
+plotSolverTime(models, "Langford-combined-symD-branchD-consFull", "all", "SavileRowTime")
+plotSolverTime(models, "Langford-combined-symD-branchD-consFull", "all", "SolverSolutionsFound")
 
-plotSolverTime(["Langford-direct", "Langford-positional"], "noch", "Time")
-plotSolverTime(["Langford-direct", "Langford-positional"], "noch", "SolverTime")
-plotSolverTime(["Langford-direct", "Langford-positional"], "noch", "SavileRowTime")
-plotSolverTime(["Langford-direct", "Langford-positional"], "noch", "SolverSolutionsFound")
-
-
-
-
-
-modelFace = {}
-modelFace['Langford-direct']                         = 'direct'
-modelFace['Langford-direct-wdeg']                    = 'direct-wdeg'
-modelFace['Langford-direct-domoverwdeg']             = 'direct-domoverwdeg'
-modelFace['Langford-positional']                     = 'positional'
-modelFace['Langford-positional-wdeg']                = 'positional-wdeg'
-modelFace['Langford-positional-domoverwdeg']         = 'positional-domoverwdeg'
-modelFace['Langford-combined-symD-branchD-consD']    = 'symD-branchD-consD'
-modelFace['Langford-combined-symD-branchD-consFull'] = 'symD-branchD-consFull'
-modelFace['Langford-combined-symD-branchD-consP']    = 'symD-branchD-consP'
-modelFace['Langford-combined-symD-branchP-consD']    = 'symD-branchP-consD'
-modelFace['Langford-combined-symD-branchP-consFull'] = 'symD-branchP-consFull'
-modelFace['Langford-combined-symD-branchP-consP']    = 'symD-branchP-consP'
-modelFace['Langford-combined-symP-branchD-consD']    = 'symP-branchD-consD'
-modelFace['Langford-combined-symP-branchD-consFull'] = 'symP-branchD-consFull'
-modelFace['Langford-combined-symP-branchD-consP']    = 'symP-branchD-consP'
-modelFace['Langford-combined-symP-branchP-consD']    = 'symP-branchP-consD'
-modelFace['Langford-combined-symP-branchP-consFull'] = 'symP-branchP-consFull'
-modelFace['Langford-combined-symP-branchP-consP']    = 'symP-branchP-consP'
-modelFace['Langford-combined-symD-sdf']              = "symD-sdf"
-modelFace['Langford-combined-symP-sdf']              = "symP-sdf"
+plotSolverTime(["Langford-direct", "Langford-positional"], "Langford-combined-symD-branchD-consFull", "noch", "Time")
+plotSolverTime(["Langford-direct", "Langford-positional"], "Langford-combined-symD-branchD-consFull", "noch", "SolverTime")
+plotSolverTime(["Langford-direct", "Langford-positional"], "Langford-combined-symD-branchD-consFull", "noch", "SavileRowTime")
+plotSolverTime(["Langford-direct", "Langford-positional"], "Langford-combined-symD-branchD-consFull", "noch", "SolverSolutionsFound")
 
 
 
