@@ -299,6 +299,9 @@ plotNodes(["Langford-combined-symD-branchD-consFull", "Langford-combined-symP-br
 
 plotNodes(["Langford-combined-symD-branchD-consFull", "Langford-combined-symP-branchP-consFull"], "Langford-combined-symD-branchD-consFull", "branchDvsP")
 
+plotNodes(["Langford-combined-symD-branchD-consFull", "Langford-direct"], "Langford-combined-symD-branchD-consFull", "directs")
+plotNodes(["Langford-combined-symP-branchP-consFull", "Langford-positional"], "Langford-combined-symP-branchP-consFull", "positionals")
+
 
 
 plotNodes(cpmodels, "Langford-combined-symD-branchD-consFull", "all")
