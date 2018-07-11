@@ -10,7 +10,7 @@ parallel \
     --results logs/results-sat \
     --timeout 4h \
     --eta \
-    "conjure solve {2} {1} --number-of-solutions all -o outputs/{2/.}-{3} --copy-solutions=no --solutions-in-one-file" \
+    "conjure solve {2} {1} --number-of-solutions all -o outputs/{2/.}-{3} --copy-solutions=no --solutions-in-one-file --solver {3}" \
     ::: params/*.param \
     ::: models/Langford-direct.essence models/Langford-positional.essence models/Langford-combined-symD-sdf.essence models/Langford-combined-symP-sdf.essence \
     ::: bc_minisat_all nbc_minisat_all
